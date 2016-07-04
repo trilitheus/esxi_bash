@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+
+show_usage() {
+cat << EOF
+  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-a action] [-d datastore] [-b build]
+  Do stuff to esxi host and yeah.
+EOF
+}
+
+OPTIND=1
+while getopts "u:a:d:b:" opt; do
+  case $opt in
+    u)
+      ESXI_USER=${OPTARG}
+      ;;
+    h)
+      ESXI_HOSTNAME=${OPTARG}
+      ;;
+    a)
+      ACTION=${OPTARG}
+      ;;
+    i)
+      ID_FILE=${OPTARG}
+      ;;
+    d)
+      DS=${OPTARG}
+      ;;
+    b)
+      DIR=${OPTARG}
+      ;;
+    \?)
+      echo "Invalid arg: -${OPTARG}"
+      show_usage
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      show_usage
+      exit 1
+      ;;
+  esac
+done
+shift "$((OPTIND-1))"
+
+case ${ACTION} in
+  power-on|power-off)
+    ssh ${ESXI_HOSTNAME} -i ${ID_FILE} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+    ;;
+  registervm)
+    ssh ${ESXI_HOSTNAME} -i ${ID_FILE} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
+    ;;
+  *)
+    show_usage
+    exit 1
+    ;;
+esac
