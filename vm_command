@@ -4,13 +4,13 @@ set -e
 
 show_usage() {
 cat << EOF
-  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-a action] [-d datastore] [-b build]
+  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-d datastore] [-b build]
   Do stuff to esxi host and yeah.
 EOF
 }
 
 OPTIND=1
-while getopts "u:a:d:b:" opt; do
+while getopts "u:h:a:i:d:b:" opt; do
   case $opt in
     u)
       ESXI_USER=${OPTARG}
