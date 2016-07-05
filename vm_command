@@ -69,7 +69,10 @@ case ${ACTION} in
     power
     ;;
   registervm)
-    ssh ${ESXI_HOSTNAME} -i ${ID_FILE} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
+    register_vm
+    ;;
+  clonevm)
+    clone_vm
     ;;
   *)
     show_usage
