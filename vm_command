@@ -4,13 +4,13 @@ set -e
 
 show_usage() {
 cat << EOF
-  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-d datastore] [-b build] [-o clone_dir ]
+  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-d datastore] [-b build] [-o clone_dir ] [-v]
   Do stuff to esxi host and yeah.
 EOF
 }
 
 OPTIND=1
-while getopts "u:h:a:i:d:b:o:" opt; do
+while getopts "u:h:a:i:d:b:o:v" opt; do
   case $opt in
     u)
       ESXI_USER=${OPTARG}
@@ -33,6 +33,9 @@ while getopts "u:h:a:i:d:b:o:" opt; do
     o)
       OUTDIR=${OPTARG}
       ;;
+    v)
+      VERBOSE=true
+      ;;
     \?)
       echo "Invalid arg: -${OPTARG}"
       show_usage
@@ -50,20 +53,31 @@ shift "$((OPTIND-1))"
 SSHCMD="ssh ${ESXI_USER}@${ESXI_HOSTNAME} -i ${ID_FILE}"
 
 function power() {
+  if $VERBOSE; then
+    echo ${SSHCMD} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+  fi
   ${SSHCMD} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
 }
 
 function register_vm() {
+  if $VERBOSE; then
+    echo ${SSHCMD} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
+  fi
   ${SSHCMD} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
 }
 
 function clone_vm() {
+  if $VERBOSE; then
+    echo ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
+    echo ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
+    echo ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
+    echo ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx"
+  fi
   ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
   ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
   ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk'"
-  echo ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
-  ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
-  ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx"
+  ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
+  ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
 }
 
 case ${ACTION} in
