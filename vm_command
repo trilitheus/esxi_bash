@@ -71,13 +71,13 @@ function clone_vm() {
     echo ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
     echo ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
     echo ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
-    echo ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx"
+    echo ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
   fi
   ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
   ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
   ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk'"
   ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
-  ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
+  ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
 }
 
 case ${ACTION} in
