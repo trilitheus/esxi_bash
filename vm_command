@@ -44,9 +44,26 @@ while getopts "u:h:a:i:d:b:" opt; do
 done
 shift "$((OPTIND-1))"
 
+SSHCMD="ssh ${ESXI_HOSTNAME} -i ${ID_FILE}"
+
+function power() {
+  ${SSHCMD} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+}
+
+function register_vm() {
+  ${SSHCMD} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
+}
+
+function clone_vm() {
+  ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
+  ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
+  ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp {} /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk \\\;"
+  ${SSHCMD} "vim-cmd solo/registervm /volumes/vmfs/${DS}/${OUTDIR}/packer-centos7.vmx"
+}
+
 case ${ACTION} in
   power-on|power-off)
-    ssh ${ESXI_HOSTNAME} -i ${ID_FILE} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+    power
     ;;
   registervm)
     ssh ${ESXI_HOSTNAME} -i ${ID_FILE} "vim-cmd solo/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
