@@ -47,7 +47,7 @@ while getopts "u:h:a:i:d:b:o:" opt; do
 done
 shift "$((OPTIND-1))"
 
-SSHCMD="ssh ${ESXI_HOSTNAME} -v"
+SSHCMD="ssh ${ESXI_USER}@${ESXI_HOSTNAME} -i ${ID_FILE}"
 
 function power() {
   ${SSHCMD} "vim-cmd vmsvc/${ACTION} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
