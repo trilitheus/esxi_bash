@@ -5,7 +5,15 @@ set -e
 show_usage() {
 cat << EOF
   Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-d datastore] [-b build] [-o clone_dir ] [-v]
-  Do stuff to esxi host and yeah.
+
+  -u esxi_username : specify the username to connect to esxi with
+  -h esxi_hostname : specify the esxi host
+  -i ssh_key_file  : The ssh private key used to log into the esxi server
+  -a action        : The action to perform (currently power-on, power-off, registervm, clonevm)
+  -d datastore     : datastore containing the VM we are acting upon
+  -b build         : the pipeline build number
+  -o clone_dir     : the directory to clone to for clonevm actions
+  -v               : be more verbose
 EOF
 }
 
