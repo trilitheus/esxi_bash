@@ -90,9 +90,9 @@ function clone_vm() {
 
 function get_ip() {
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd vmsvc/get.summary $(vim-cmd vmsvc/getallvms | grep ' ${DIR}/packer' | awk '{print $1}') | grep ip | awk -F'\"' '{print $2}'"
+    echo ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep ip | awk -F'\"' '{print $2}'
   fi
-  ${SSHCMD} "vim-cmd vmsvc/get.summary $(vim-cmd vmsvc/getallvms | grep ' ${DIR}/packer' | awk '{print $1}') | grep ip | awk -F'\"' '{print $2}'"
+  ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep ip | awk -F'\"' '{print $2}'
 }
 
 case ${ACTION} in
