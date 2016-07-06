@@ -88,6 +88,13 @@ function clone_vm() {
   ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
 }
 
+function get_ip() {
+  if $VERBOSE; then
+    echo ${SSHCMD} "vim-cmd vmsvc/get.summary $(vim-cmd vmsvc/getallvms | grep ' ${DIR}/packer' | awk '{print $1}') | grep ip | awk -F'\"' '{print $2}'"
+  fi
+  ${SSHCMD} "vim-cmd vmsvc/get.summary $(vim-cmd vmsvc/getallvms | grep ' ${DIR}/packer' | awk '{print $1}') | grep ip | awk -F'\"' '{print $2}'"
+}
+
 case ${ACTION} in
   power-on|power-off)
     power
@@ -97,6 +104,9 @@ case ${ACTION} in
     ;;
   clonevm)
     clone_vm
+    ;;
+  getip)
+    get_ip
     ;;
   *)
     show_usage
