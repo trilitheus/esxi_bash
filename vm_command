@@ -63,31 +63,31 @@ SSHCMD="ssh ${ESXI_USER}@${ESXI_HOSTNAME} -i ${ID_FILE}"
 function power() {
   [[ ${ACTION} = 'poweron' ]] && ACT='power.on' || ACT='power.shutdown'
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd vmsvc/${ACT} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+    echo "${SSHCMD}" "vim-cmd vmsvc/${ACT} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
   fi
   ${SSHCMD} "vim-cmd vmsvc/${ACT} \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
 }
 
 function register_vm() {
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
+    echo "${SSHCMD}" "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
   fi
   ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
 }
 
 function unregister_vm() {
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd vmsvc/unregister \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+    echo "${SSHCMD}" "vim-cmd vmsvc/unregister \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
   fi
   ${SSHCMD} "vim-cmd vmsvc/unregister \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
 }
 
 function clone_vm() {
   if $VERBOSE; then
-    echo ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
-    echo ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk -d thin /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
-    echo ${SSHCMD} "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
-    echo ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
+    echo "${SSHCMD}" "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
+    echo "${SSHCMD}" "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk -d thin /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
+    echo "${SSHCMD}" "find /vmfs/volumes/${DS}/${DIR} -type f -not -name '*.vmdk' -exec cp -v \"{}\" /vmfs/volumes/${DS}/${OUTDIR} \\;"
+    echo "${SSHCMD}" "vim-cmd solo/registervm /vmfs/volumes/${DS}/${OUTDIR}/packer-centos7.vmx ${OUTDIR}"
   fi
   ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
   ${SSHCMD} "vmkfstools -i /vmfs/volumes/${DS}/${DIR}/disk.vmdk -d thin /vmfs/volumes/${DS}/${OUTDIR}/disk.vmdk"
@@ -98,14 +98,14 @@ function clone_vm() {
 
 function get_ip() {
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep ip | awk -F'\"' '{print $2}'
+    echo "${SSHCMD}" "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep ip | awk -F'\"' '{print $2}'
   fi
   ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep ip | awk -F'\"' '{print $2}'
 }
 
 function get_state() {
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep powerState | awk -F'\"' '{print $2}'
+    echo "${SSHCMD}" "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep powerState | awk -F'\"' '{print $2}'
   fi
   ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep powerState | awk -F'\"' '{print $2}'
 }
