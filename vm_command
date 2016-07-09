@@ -69,13 +69,18 @@ function power() {
 }
 
 function register_vm() {
-  [[ ${ACTION} = 'registervm' ]] && CMD='solo' || CMD='vmsvc'
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd ${CMD}/${ACTION} /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
+    echo ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
   fi
-  ${SSHCMD} "vim-cmd ${CMD}/${ACTION} /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
+  ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
 }
 
+function unregister_vm() {
+  if $VERBOSE; then
+    echo ${SSHCMD} "vim-cmd vmsvc/unregister \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+  fi
+  ${SSHCMD} "vim-cmd vmsvc/unregister \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1)"
+}
 function clone_vm() {
   if $VERBOSE; then
     echo ${SSHCMD} "mkdir /vmfs/volumes/${DS}/${OUTDIR}"
@@ -101,8 +106,11 @@ case ${ACTION} in
   poweron|poweroff)
     power
     ;;
-  registervm|unregistervm)
+  registervm)
     register_vm
+    ;;
+  unregistervm)
+    unregister_vm
     ;;
   clonevm)
     clone_vm
