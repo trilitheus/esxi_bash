@@ -70,7 +70,7 @@ function power() {
 function register_vm() {
   [[ ${ACTION} = 'registervm' ]] && CMD='solo' || CMD='vmsvc'
   if $VERBOSE; then
-    echo ${SSHCMD} "vim-cmd $CMD}/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
+    echo ${SSHCMD} "vim-cmd ${CMD}/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
   fi
   ${SSHCMD} "vim-cmd ${CMD}/${ACTION} /volumes/vmfs/${DS}/${DIR}/packer-centos7.vmx"
 }
