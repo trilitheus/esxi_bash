@@ -70,9 +70,9 @@ function power() {
 
 function register_vm() {
   if $VERBOSE; then
-    echo "${SSHCMD}" "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
+    echo "${SSHCMD}" "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx ${OUTDIR}"
   fi
-  ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx"
+  ${SSHCMD} "vim-cmd solo/registervm /vmfs/volumes/${DS}/${DIR}/packer-centos7.vmx ${OUTDIR}"
 }
 
 function unregister_vm() {
