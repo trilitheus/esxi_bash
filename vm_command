@@ -4,12 +4,13 @@ set -e
 
 show_usage() {
 cat << EOF
-  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-d datastore] [-b build] [-o clone_dir ] [-v]
+  Usage: ${0##*/} [-u esxi_username] [-h esxi_hostname] [-i ssh_key_file] [-a action] [-s size] [-d datastore] [-b build] [-o clone_dir ] [-v]
 
   -u esxi_username : specify the username to connect to esxi with
   -h esxi_hostname : specify the esxi host
   -i ssh_key_file  : The ssh private key used to log into the esxi server
-  -a action        : The action to perform (currently poweron, poweroff, registervm, unregistervm, clonevm, getstate, getip)
+  -a action        : The action to perform (currently poweron, poweroff, registervm, unregistervm, clonevm, getstate, getip, newdisk)
+  -s size          : Size of disk to add if using newdisk action
   -d datastore     : datastore containing the VM we are acting upon
   -b build         : the pipeline build number
   -o clone_dir     : the directory to clone to for clonevm actions
@@ -18,7 +19,7 @@ EOF
 }
 
 OPTIND=1
-while getopts "u:h:a:i:d:b:o:v" opt; do
+while getopts "u:h:a:i:s:d:b:o:v" opt; do
   case $opt in
     u)
       ESXI_USER=${OPTARG}
@@ -28,6 +29,9 @@ while getopts "u:h:a:i:d:b:o:v" opt; do
       ;;
     a)
       ACTION=${OPTARG}
+      ;;
+    s)
+      SIZE=${OPTARG}
       ;;
     i)
       ID_FILE=${OPTARG}
@@ -110,6 +114,13 @@ function get_state() {
   ${SSHCMD} "vim-cmd vmsvc/get.summary \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/\" | cut -d\" \" -f1)" | grep powerState | awk -F'\"' '{print $2}'
 }
 
+function new_disk() {
+  if $VERBOSE; then
+    echo "${SSHCMD}" "vim-cmd vmsvc/device.diskadd \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) ${SIZE} 0 1 ${DS}"
+  fi
+  ${SSHCMD} "vim-cmd vmsvc/device.diskadd \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) ${SIZE} 0 1 ${DS}"
+}
+
 case ${ACTION} in
   poweron|poweroff)
     power
@@ -128,6 +139,9 @@ case ${ACTION} in
     ;;
   getip)
     get_ip
+    ;;
+  newdisk)
+    new_disk
     ;;
   *)
     show_usage
