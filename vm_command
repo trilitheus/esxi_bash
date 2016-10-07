@@ -117,11 +117,11 @@ function get_state() {
 function new_disk() {
   if $VERBOSE; then
     echo "${SSHCMD}" "vmkfstools -c ${SIZE}G -d thin /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk"
-    echo "${SSHCMD}" "vim-cmd vmsvc/device.diskaddexisting \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk 0 1 ${DS}"
+    echo "${SSHCMD}" "vim-cmd vmsvc/device.diskaddexisting \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk 0 1"
   fi
   ${SSHCMD} "vmkfstools -c ${SIZE}G -d thin /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk"
   sleep 5 # Allow time for ESXi to initialise the disk
-  ${SSHCMD} "vim-cmd vmsvc/device.diskaddexisting \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk 0 1 ${DS}"
+  ${SSHCMD} "vim-cmd vmsvc/device.diskaddexisting \$(vim-cmd vmsvc/getallvms | grep \"\[${DS}\] ${DIR}/packer-centos7\" | cut -d\" \" -f1) /vmfs/volumes/${DS}/${DIR}/datadisk.vmdk 0 1"
 }
 
 case ${ACTION} in
